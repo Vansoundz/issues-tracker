@@ -20,6 +20,14 @@ interface Issue {
   };
   comments: {
     totalCount: number;
+    nodes: {
+      author: {
+        login: string;
+        avatarUrl: string;
+      };
+      body: string;
+      id: string;
+    }[];
   };
 }
 

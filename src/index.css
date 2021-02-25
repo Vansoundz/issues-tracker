@@ -22,15 +22,20 @@
 button {
   cursor: pointer;
   padding: 8px 24px;
+  border-radius: 4px;
+  margin-top: 8px;
 }
 
 button:hover {
   border-radius: 1px solid #ddd;
-  border-radius: 4px;
 }
 
-.app > button {
+.app > button,
+.add-comment button {
   background: rebeccapurple;
   color: white;
   font-size: 18px;
+}
+.app > button > * {
+  color: white;
 }

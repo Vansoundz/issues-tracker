@@ -15,7 +15,7 @@ interface IssueFilters {
   states?: ("OPEN" | "CLOSED")[];
 }
 
-const ISSUES = gql`
+export const ISSUES = gql`
   query Issues($filters: IssueFilters!) {
     viewer {
       issues(first: 10, filterBy: $filters) {
@@ -40,7 +40,15 @@ const ISSUES = gql`
               name
             }
           }
-          comments(first: 5) {
+          comments(first: 10) {
+            nodes {
+              author {
+                login
+                avatarUrl
+              }
+              body
+              id
+            }
             totalCount
           }
         }
@@ -78,6 +86,7 @@ const SEARCH = gql`
             nodes {
               author {
                 login
+                avatarUrl
               }
               body
               id
@@ -95,7 +104,7 @@ const Issues = () => {
   const [filters, setFilters] = useState<IssueFilters>({});
   const [query, setQuery] = useState<string>("");
   const [search, setSearch] = useState<string>("");
-  const { loading, data, error } = useQuery(ISSUES, {
+  const { loading, data, error, refetch } = useQuery(ISSUES, {
     variables: { filters },
   });
   const [showSearch, setShowsearch] = useState(false);
@@ -262,7 +271,7 @@ const Issues = () => {
         {issues.length > 0 ? (
           <div className="table-body">
             {issues.map((issue) => (
-              <IssueComponent {...issue} key={issue.id} />
+              <IssueComponent {...issue} refetch={refetch} key={issue.id} />
             ))}
           </div>
         ) : (
