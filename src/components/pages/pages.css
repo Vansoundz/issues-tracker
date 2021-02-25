@@ -1,0 +1,76 @@
+/* issues */
+.issues .filters {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin: 16px 0;
+}
+
+.issues .filters > div {
+  margin-left: 24px;
+}
+
+#search {
+  padding: 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.table {
+  margin: 32px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-height: 300px;
+}
+
+.table .header,
+.table .issue-entry {
+  display: grid;
+  grid-template-columns: 5fr 1fr 1fr 1fr;
+}
+
+.table .header {
+  border-bottom: 1px solid #ddd;
+  padding: 16px;
+}
+
+.table-body {
+  padding: 16px;
+}
+
+.issue-entry {
+  padding: 8px 0 16px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Dropdown */
+.dropdown-container {
+  position: relative;
+}
+
+.dropdown {
+  position: absolute;
+  top: 24px;
+  width: 150px;
+  min-height: 150px;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px #ddd;
+  background: #fff;
+  padding: 8px;
+  transition: all 0.4s;
+}
+
+.dropdown ul {
+  margin-top: 8px;
+}
+
+.dropdown ul li {
+  padding: 6px 0;
+  cursor: pointer;
+  font-size: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+#filter-drop {
+  transform: scale(0);
+}
