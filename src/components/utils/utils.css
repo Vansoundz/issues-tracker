@@ -20,6 +20,12 @@
 .issue-header {
   height: 80px;
   border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+}
+
+.issue-header > span > i {
+  padding: 0 8px;
 }
 
 .comments {

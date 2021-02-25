@@ -24,6 +24,7 @@ export const ISSUES = gql`
           id
           title
           body
+          closed
           author {
             login
           }

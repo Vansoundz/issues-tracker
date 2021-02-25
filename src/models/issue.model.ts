@@ -2,6 +2,7 @@ interface Issue {
   id: string;
   title: string;
   body: string;
+  closed: boolean;
   author: {
     login: string;
   };

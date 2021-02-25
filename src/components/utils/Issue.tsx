@@ -6,7 +6,7 @@ import { gql, useMutation } from "@apollo/client";
 import Loading from "../layout/Loading";
 
 const ADD_COMMENT = gql`
-  mutation MyMutation($id: ID!, $body: String!) {
+  mutation($id: ID!, $body: String!) {
     addComment(input: { subjectId: $id, body: $body }) {
       clientMutationId
       commentEdge {
@@ -21,10 +21,31 @@ const ADD_COMMENT = gql`
   }
 `;
 
+const CLOSE_ISSUE = gql`
+  mutation($id: ID!) {
+    closeIssue(input: { issueId: $id }) {
+      issue {
+        closed
+      }
+    }
+  }
+`;
+
+const REOPEN_ISSUE = gql`
+  mutation($id: ID!) {
+    reopenIssue(input: { issueId: $id }) {
+      issue {
+        closed
+      }
+    }
+  }
+`;
+
 const IssueComponent: FC<IssueModel & { refetch: () => void }> = (props) => {
   const {
     id,
     title,
+    closed,
     comments: { totalCount, nodes: comments },
     author: { login },
     labels,
@@ -38,10 +59,17 @@ const IssueComponent: FC<IssueModel & { refetch: () => void }> = (props) => {
     variables: { id, body: comment },
   });
 
+  const [closeIssue, { loading: closing }] = useMutation(CLOSE_ISSUE, {
+    variables: { id },
+  });
+
+  const [reopenIssue, { loading: opening }] = useMutation(REOPEN_ISSUE, {
+    variables: { id },
+  });
+
   useEffect(() => {
     if (data && data.addComment?.commentEdge?.node.body) {
       let text = document.querySelector("textarea");
-
       if (!text) return;
       setComment("");
     }
@@ -49,7 +77,7 @@ const IssueComponent: FC<IssueModel & { refetch: () => void }> = (props) => {
 
   return (
     <div className="issue-entry">
-      {loading && <Loading />}
+      {(loading || closing || opening) && <Loading />}
       <Modal
         open={open}
         close={() => {
@@ -57,7 +85,39 @@ const IssueComponent: FC<IssueModel & { refetch: () => void }> = (props) => {
         }}
       >
         <div className="issue-header">
-          <h4>{title}</h4>
+          <div>
+            <h4>{title}</h4>
+            {closed ? (
+              <button
+                style={{
+                  border: "1px solid rebeccapurple",
+                  color: "rebeccapurple",
+                }}
+                onClick={async () => {
+                  await reopenIssue();
+                  await refetch();
+                }}
+              >
+                Reopen
+              </button>
+            ) : (
+              <button
+                style={{
+                  border: "1px solid rebeccapurple",
+                  color: "rebeccapurple",
+                }}
+                onClick={async () => {
+                  await closeIssue();
+                  await refetch();
+                }}
+              >
+                Close
+              </button>
+            )}
+          </div>
+          <span>
+            <i className="material-icons">edit</i>
+          </span>
         </div>
         <div className="comments">
           <div className="list">
