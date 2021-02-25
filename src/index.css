@@ -10,13 +10,13 @@
   border: none;
   background: transparent;
   color: black;
+  transition: all 0.3s;
 }
 
 .app {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
 }
 
 button {

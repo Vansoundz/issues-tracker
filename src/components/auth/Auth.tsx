@@ -1,20 +1,9 @@
-// import { gql } from "@apollo/client";
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import Loading from "../layout/Loading";
 
 const SECRET = process.env.REACT_APP_GITHUB_SECRET;
 const CLIENT_ID = process.env.REACT_APP_GITHUB_CLIENT_ID;
-
-// const USER = gql`
-//   query {
-//     viewer {
-//       login
-//       avatarUrl
-//       email
-//       name
-//     }
-//   }
-// `;
 
 const Auth = () => {
   const loc = useLocation();
@@ -38,30 +27,20 @@ const Auth = () => {
             },
           }
         );
-        // superagent
-        //   .post(
-        //     "https://cors.bridged.cc/https://github.com/login/oauth/access_token"
-        //   )
-        //   .send(body)
-        //   .set("Accept", "application/json")
-        //   .set("Content-Type", "application/json")
-        //   .set("Authorizrion", code)
-        //   .end(function (err: any, res: any) {
-        //     if (err) console.log(`error: ${err}`);
-        //     if (res){
-
-        //     }
-        //     // Calling the end function will send the request
-        //   });
         let data = await resp.json();
         if (data.access_token) {
           localStorage.setItem("__token", data.access_token);
-          window.location.href = "http://localhost:3000";
         }
+
+        window.location.href = "http://localhost:3000";
       })();
     }
   }, [code]);
-  return <div></div>;
+  return (
+    <div>
+      <Loading />
+    </div>
+  );
 };
 
 export default Auth;
