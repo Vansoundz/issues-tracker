@@ -3,6 +3,7 @@
   border-radius: 16px;
   padding: 4px 8px;
   text-align: center;
+  color: #222;
 }
 
 .modal .body {
@@ -46,12 +47,22 @@
 
 .add-comment {
   padding: 16px 0;
-  border-top: 1px solid #ddd;
+  /* border-top: 1px solid #ddd; */
 }
 
-.add-comment textarea {
-  width: 99%;
+.add-comment textarea,
+select,
+input {
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  width: 99%;
+}
+
+.flex {
+  display: flex;
+}
+
+.align-center {
+  align-items: center;
 }

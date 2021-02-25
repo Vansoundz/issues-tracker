@@ -27,7 +27,6 @@ button {
   cursor: pointer;
   padding: 8px 24px;
   border-radius: 4px;
-  margin-top: 8px;
 }
 
 button:hover {
@@ -42,4 +41,14 @@ button:hover {
 }
 .app > button > * {
   color: white;
+}
+
+.btn-border {
+  border: 1px solid rebeccapurple;
+  color: rebeccapurple;
+}
+
+.btn-purple {
+  background: rebeccapurple;
+  color: #fff;
 }

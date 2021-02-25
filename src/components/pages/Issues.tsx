@@ -1,10 +1,11 @@
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Issue } from "../../models/issue.model";
 import { RootState } from "../../store";
 import Loading from "../layout/Loading";
 import IssueComponent from "../utils/Issue";
+import Modal from "../utils/Modal";
 import "./pages.css";
 
 interface IssueFilters {
@@ -101,20 +102,80 @@ const SEARCH = gql`
   }
 `;
 
+const GET_REPOS = gql`
+  query Repos {
+    viewer {
+      repositories(first: 20) {
+        nodes {
+          id
+          isPrivate
+          name
+          owner {
+            login
+            id
+          }
+        }
+      }
+    }
+  }
+`;
+
+const CREATE_ISSUE = gql`
+  mutation CreateIssue($id: ID!, $title: String!, $body: String) {
+    createIssue(input: { repositoryId: $id, title: $title, body: $body }) {
+      issue {
+        body
+      }
+    }
+  }
+`;
+
+interface Repo {
+  id?: string;
+
+  isPrivate: boolean;
+  name: string;
+  owner: {
+    login: string;
+    id: string;
+  };
+}
+
 const Issues = () => {
   const [filters, setFilters] = useState<IssueFilters>({});
+  const [repositories, setrepositories] = useState<Repo[]>([]);
   const [query, setQuery] = useState<string>("");
   const [search, setSearch] = useState<string>("");
+  const [issue, setIssue] = useState<{
+    id: string;
+    title: string;
+    body?: string;
+  }>({ id: "", title: "" });
   const { loading, data, error, refetch } = useQuery(ISSUES, {
     variables: { filters },
   });
+  const { data: repos } = useQuery(GET_REPOS, {
+    variables: { filters },
+  });
+
   const [showSearch, setShowsearch] = useState(false);
+  const [createissueModal, setCreateissueModal] = useState(false);
   const [issues, setIssues] = useState<Issue[]>([]);
   const { user } = useSelector((state: RootState) => state.auth);
+
+  const [createIssue, { loading: creating }] = useMutation(CREATE_ISSUE, {
+    variables: { ...issue },
+  });
 
   const { loading: searching, data: searchData } = useQuery(SEARCH, {
     variables: { query },
   });
+
+  useEffect(() => {
+    if (repos && repos.viewer?.repositories?.nodes) {
+      setrepositories(repos.viewer?.repositories?.nodes);
+    }
+  }, [repos]);
 
   useEffect(() => {
     if (data && data.viewer?.issues?.nodes) {
@@ -142,124 +203,220 @@ const Issues = () => {
 
   return (
     <div className="issues">
-      {(loading || searching) && <Loading />}
-
-      <div className="filters">
-        <div className="add-filter dropdown-container">
-          <button
-            onClick={() => {
-              const el = document.getElementById("filter-drop");
-              if (!el) return;
-              el.style.transform = "scale(1)";
-            }}
-            onBlur={() => {
-              const el = document.getElementById("filter-drop");
-              if (!el) return;
-              setTimeout(() => (el.style.transform = "scale(0)"), 100);
-            }}
-          >
-            Add filter
-          </button>
-          <div
-            id="filter-drop"
-            className="query-filter dropdown"
-            onClick={() => setShowsearch(false)}
-          >
-            <h4>Filter by</h4>
-            <ul>
-              <li
-                onClick={() => {
-                  setFilters({
-                    ...filters,
-                    assignee: filters.assignee ? undefined : "vansoundz",
-                  });
+      {(loading || searching || creating) && <Loading />}
+      <Modal
+        open={createissueModal}
+        close={() => {
+          setCreateissueModal(!createissueModal);
+        }}
+      >
+        <div className="issue-header">
+          <h4>Create Issue</h4>
+        </div>
+        <div className="comments">
+          <div className="list">
+            <div>
+              <div>
+                <label htmlFor="title">Title</label>
+              </div>
+              <input
+                type="text"
+                id="title"
+                onChange={(e) =>
+                  setIssue({
+                    ...issue,
+                    title: e.target.value,
+                  })
+                }
+              />
+            </div>
+            <div className="add-comment">
+              <div>
+                <label>Description</label>
+              </div>
+              <textarea
+                rows={4}
+                value={issue.body || ""}
+                onChange={(e) =>
+                  setIssue({
+                    ...issue,
+                    body: e.target.value,
+                  })
+                }
+              ></textarea>
+              <div
+                style={{
+                  padding: "16px 0",
                 }}
               >
-                <span> {filters.assignee ? <>&#10004;</> : ""}</span>{" "}
-                <span>Assigned to me</span>
-              </li>
-              <li
-                onClick={() => {
-                  setFilters({
-                    ...filters,
-                    createdBy: filters.createdBy ? undefined : "vansoundz",
-                  });
-                }}
-              >
-                <span>{filters.createdBy ? <>&#10004;</> : ""}</span>{" "}
-                <span>Created by me</span>
-              </li>
-              <li
-                onClick={() => {
-                  setFilters({
-                    ...filters,
-                    states: filters.states?.includes("OPEN")
-                      ? filters.states.filter((s) => s !== "OPEN")
-                      : filters.states
-                      ? [...filters.states, "OPEN"]
-                      : [],
-                  });
-                }}
-              >
-                <span>
-                  {filters.states?.includes("OPEN") ? <>&#10004;</> : ""}
-                </span>{" "}
-                <span>Open</span>
-              </li>
-              <li
-                onClick={() => {
-                  setFilters({
-                    ...filters,
-                    states: filters.states?.includes("CLOSED")
-                      ? filters.states.filter((s) => s !== "CLOSED")
-                      : filters.states
-                      ? [...filters.states, "CLOSED"]
-                      : [],
-                  });
-                }}
-              >
-                <span>
-                  {filters.states?.includes("CLOSED") ? <>&#10004;</> : ""}
-                </span>{" "}
-                <span>Closed</span>
-              </li>
-              <li
-                onClick={() => {
-                  setFilters({
-                    ...filters,
-                    mentioned: filters.mentioned ? undefined : "vansoundz",
-                  });
-                }}
-              >
-                <span>{filters.mentioned ? <>&#10004;</> : ""}</span>{" "}
-                <span>Mentioned</span>
-              </li>
-            </ul>
+                <div>
+                  <label>Choose repo</label>
+                </div>
+                <select
+                  onChange={(e) => setIssue({ ...issue, id: e.target.value })}
+                  style={{
+                    padding: 8,
+                  }}
+                >
+                  <option disabled>Choose repository</option>
+                  {repositories &&
+                    repositories.map(({ name, id }) => {
+                      return (
+                        <option key={id} value={id}>
+                          {name}
+                        </option>
+                      );
+                    })}
+                </select>
+              </div>
+              <div>
+                <button
+                  onClick={async (e) => {
+                    await createIssue();
+                    await refetch();
+                    setCreateissueModal(!createissueModal);
+                  }}
+                >
+                  create Issue
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="search">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
+      </Modal>
 
-              if (search?.length > 3) {
-                setShowsearch(true);
-                setQuery(`user:${user?.login} in:title ${search}`);
-              }
-            }}
+      <div className="filters" style={{ justifyContent: "space-between" }}>
+        <div>
+          <button
+            className="btn-border"
+            onClick={() => setCreateissueModal(!createissueModal)}
           >
-            <input
-              type="search"
-              onChange={(e) => {
-                if (e.target.value.length <= 3) {
-                  setShowsearch(false);
-                }
-                setSearch(e.target.value);
+            Create Issue
+          </button>
+        </div>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div className="add-filter dropdown-container">
+            <button
+              className="btn-border flex align-center"
+              onClick={() => {
+                const el = document.getElementById("filter-drop");
+                if (!el) return;
+                el.style.transform = "scale(1)";
               }}
-              placeholder="Search issues"
-              id="search"
-            />
-          </form>
+              onBlur={() => {
+                const el = document.getElementById("filter-drop");
+                if (!el) return;
+                setTimeout(() => (el.style.transform = "scale(0)"), 100);
+              }}
+            >
+              <span>
+                <i style={{ fontSize: 14 }} className="material-icons">
+                  filter_alt
+                </i>
+              </span>{" "}
+              <span> Add filter</span>
+            </button>
+            <div
+              id="filter-drop"
+              className="query-filter dropdown"
+              onClick={() => setShowsearch(false)}
+            >
+              <h4>Filter by</h4>
+              <ul>
+                <li
+                  onClick={() => {
+                    setFilters({
+                      ...filters,
+                      assignee: filters.assignee ? undefined : "vansoundz",
+                    });
+                  }}
+                >
+                  <span> {filters.assignee ? <>&#10004;</> : ""}</span>{" "}
+                  <span>Assigned to me</span>
+                </li>
+                <li
+                  onClick={() => {
+                    setFilters({
+                      ...filters,
+                      createdBy: filters.createdBy ? undefined : "vansoundz",
+                    });
+                  }}
+                >
+                  <span>{filters.createdBy ? <>&#10004;</> : ""}</span>{" "}
+                  <span>Created by me</span>
+                </li>
+                <li
+                  onClick={() => {
+                    setFilters({
+                      ...filters,
+                      states: filters.states?.includes("OPEN")
+                        ? filters.states.filter((s) => s !== "OPEN")
+                        : filters.states
+                        ? [...filters.states, "OPEN"]
+                        : [],
+                    });
+                  }}
+                >
+                  <span>
+                    {filters.states?.includes("OPEN") ? <>&#10004;</> : ""}
+                  </span>{" "}
+                  <span>Open</span>
+                </li>
+                <li
+                  onClick={() => {
+                    setFilters({
+                      ...filters,
+                      states: filters.states?.includes("CLOSED")
+                        ? filters.states.filter((s) => s !== "CLOSED")
+                        : filters.states
+                        ? [...filters.states, "CLOSED"]
+                        : [],
+                    });
+                  }}
+                >
+                  <span>
+                    {filters.states?.includes("CLOSED") ? <>&#10004;</> : ""}
+                  </span>{" "}
+                  <span>Closed</span>
+                </li>
+                <li
+                  onClick={() => {
+                    setFilters({
+                      ...filters,
+                      mentioned: filters.mentioned ? undefined : "vansoundz",
+                    });
+                  }}
+                >
+                  <span>{filters.mentioned ? <>&#10004;</> : ""}</span>{" "}
+                  <span>Mentioned</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="search">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+
+                if (search?.length > 3) {
+                  setShowsearch(true);
+                  setQuery(`user:${user?.login} in:title ${search}`);
+                }
+              }}
+            >
+              <input
+                type="search"
+                onChange={(e) => {
+                  if (e.target.value.length <= 3) {
+                    setShowsearch(false);
+                  }
+                  setSearch(e.target.value);
+                }}
+                placeholder="Search issues"
+                id="search"
+              />
+            </form>
+          </div>
         </div>
       </div>
       <div className="table">

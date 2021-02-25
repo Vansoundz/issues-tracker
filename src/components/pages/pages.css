@@ -6,14 +6,17 @@
   margin: 16px 0;
 }
 
-.issues .filters > div {
+/* .issues .filters > div {
   margin-left: 24px;
-}
+} */
 
 #search {
-  padding: 6px;
+  padding: 8px;
+  padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  margin-left: 16px;
+  width: inherit;
 }
 
 .table {
