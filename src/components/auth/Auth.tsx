@@ -32,7 +32,7 @@ const Auth = () => {
           localStorage.setItem("__token", data.access_token);
         }
 
-        window.location.href = "http://localhost:3000";
+        window.location.href = "https://gtrackr.netlify.app/";
       })();
     }
   }, [code]);
