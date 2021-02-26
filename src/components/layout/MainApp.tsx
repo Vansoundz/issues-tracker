@@ -5,16 +5,19 @@ import { paths } from "../../routes/paths";
 import { RootState } from "../../store";
 import Appbar from "./Appbar";
 import "./layout.css";
+import Loading from "./Loading";
 
 const MainApp: FC = ({ children }) => {
-  const { isLoggedIn } = useSelector((state: RootState) => state.auth);
+  const { isLoggedIn, loading } = useSelector((state: RootState) => state.auth);
   const h = useHistory();
 
   useEffect(() => {
-    if (!isLoggedIn) {
-      h.push(paths.index);
+    if (!loading) {
+      if (!isLoggedIn) {
+        h.push(paths.index);
+      }
     }
-  }, [isLoggedIn, h]);
+  }, [isLoggedIn, h, loading]);
 
   const links = [
     { label: "Issues", to: paths.issues },
@@ -25,11 +28,18 @@ const MainApp: FC = ({ children }) => {
 
   const { pathname } = useLocation();
 
+  if (loading) return <Loading />;
+
   return (
     <div className="main-app">
       <div>
         <div className="sidebar">
-          <div className="brand">GTrack</div>
+          <div className="brand">
+            <span>
+              <img src="/logo512.png" alt="logo" />
+            </span>
+            <span>GTrack</span>
+          </div>
           <ul className="nav">
             {links.map(({ label, to }, i) => {
               return (

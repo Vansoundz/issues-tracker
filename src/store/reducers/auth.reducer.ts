@@ -1,5 +1,5 @@
 import { TYPES } from "../types";
-import { AuthReducer } from "../types/reducers";
+import { AuthReducer } from "../types/reducerTypes";
 
 const initState: AuthReducer = { isLoggedIn: false, loading: true };
 

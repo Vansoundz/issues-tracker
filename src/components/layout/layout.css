@@ -7,14 +7,23 @@
   height: 100%;
   position: fixed;
   width: calc(100vw / 6);
-  background: #ddd;
+  background: #fff;
   display: grid;
   grid-template-rows: 1fr 2fr;
   z-index: 100;
+  border-right: 1px solid #ddd;
 }
 
 .brand {
   padding: 16px;
+  display: flex;
+  align-items: center;
+  height: 50px;
+}
+
+.brand img {
+  width: 30px;
+  margin-right: 8px;
 }
 
 .link {
@@ -23,7 +32,7 @@
 }
 
 .link.active {
-  background: rebeccapurple;
+  background: var(--purple);
 }
 
 .link.active > * {
@@ -34,7 +43,7 @@
   position: absolute;
   left: 0;
   top: 0;
-  background: orange;
+  background: var(--orange);
   height: 0;
   width: 0;
 }

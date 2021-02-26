@@ -1,9 +1,18 @@
+import { ApolloQueryResult } from "@apollo/client";
 import React, { FC } from "react";
+import { IssueFilters } from "../../models/issue.model";
 import { usePreventScroll } from "../../utils/hooks";
 
-interface IModal {
+export interface IModal {
   open: boolean;
   close: () => void;
+  refetch?: (
+    variables?:
+      | Partial<{
+          filters: IssueFilters;
+        }>
+      | undefined
+  ) => Promise<ApolloQueryResult<any>>;
 }
 
 const Modal: FC<IModal> = ({ children, close, open }) => {

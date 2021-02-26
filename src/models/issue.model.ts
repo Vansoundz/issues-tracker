@@ -1,35 +1,45 @@
+import { User } from "./user.model";
+
+interface Comment {
+  author: User;
+  body: string;
+  id: string;
+}
+
 interface Issue {
   id: string;
   title: string;
   body: string;
   closed: boolean;
-  author: {
-    login: string;
-  };
+  author: User;
   assignees: {
     totalCount: number;
-    nodes: { login: string }[];
+    nodes: User[];
   };
   labels: {
     totalCount: number;
-    nodes: [
-      {
-        color: string;
-        name: string;
-      }
-    ];
+    nodes: {
+      color: string;
+      name: string;
+    }[];
   };
   comments: {
     totalCount: number;
-    nodes: {
-      author: {
-        login: string;
-        avatarUrl: string;
-      };
-      body: string;
-      id: string;
-    }[];
+    nodes: Comment[];
   };
 }
 
-export type { Issue };
+interface IssueFilters {
+  assignee?: string;
+  createdBy?: string;
+  labels?: string[];
+  mentioned?: string;
+  states?: ("OPEN" | "CLOSED")[];
+}
+
+type TAction = {
+  type: string;
+  payload: IssueFilters;
+};
+
+export type { Issue, IssueFilters, TAction, Comment };

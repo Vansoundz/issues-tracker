@@ -1,184 +1,84 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useState } from "react";
 import { Issue as IssueModel } from "../../models/issue.model";
 import Label from "./Label";
-import Modal from "../utils/Modal";
-import { gql, useMutation } from "@apollo/client";
-import Loading from "../layout/Loading";
-
-const ADD_COMMENT = gql`
-  mutation($id: ID!, $body: String!) {
-    addComment(input: { subjectId: $id, body: $body }) {
-      clientMutationId
-      commentEdge {
-        node {
-          author {
-            login
-          }
-          body
-        }
-      }
-    }
-  }
-`;
-
-const CLOSE_ISSUE = gql`
-  mutation($id: ID!) {
-    closeIssue(input: { issueId: $id }) {
-      issue {
-        closed
-      }
-    }
-  }
-`;
-
-const REOPEN_ISSUE = gql`
-  mutation($id: ID!) {
-    reopenIssue(input: { issueId: $id }) {
-      issue {
-        closed
-      }
-    }
-  }
-`;
+import EditIssue from "./EditIssue";
 
 const IssueComponent: FC<IssueModel & { refetch: () => void }> = (props) => {
   const {
-    id,
     title,
-    closed,
-    comments: { totalCount, nodes: comments },
-    author: { login },
+    comments: { totalCount },
+    author: { login, avatarUrl },
     labels,
     assignees: { nodes, totalCount: numOfPeople },
-    refetch,
   } = props;
+
   const [open, setOpen] = useState(false);
-  const [comment, setComment] = useState<string>("");
-
-  const [addComment, { loading, data }] = useMutation(ADD_COMMENT, {
-    variables: { id, body: comment },
-  });
-
-  const [closeIssue, { loading: closing }] = useMutation(CLOSE_ISSUE, {
-    variables: { id },
-  });
-
-  const [reopenIssue, { loading: opening }] = useMutation(REOPEN_ISSUE, {
-    variables: { id },
-  });
-
-  useEffect(() => {
-    if (data && data.addComment?.commentEdge?.node.body) {
-      let text = document.querySelector("textarea");
-      if (!text) return;
-      setComment("");
-    }
-  }, [data]);
 
   return (
     <div className="issue-entry">
-      {(loading || closing || opening) && <Loading />}
-      <Modal
-        open={open}
-        close={() => {
-          setOpen(!open);
-        }}
-      >
-        <div className="issue-header">
-          <div>
-            <h4>{title}</h4>
-            {closed ? (
-              <button
-                style={{
-                  border: "1px solid rebeccapurple",
-                  color: "rebeccapurple",
-                }}
-                onClick={async () => {
-                  await reopenIssue();
-                  await refetch();
-                }}
-              >
-                Reopen
-              </button>
-            ) : (
-              <button
-                style={{
-                  border: "1px solid rebeccapurple",
-                  color: "rebeccapurple",
-                }}
-                onClick={async () => {
-                  await closeIssue();
-                  await refetch();
-                }}
-              >
-                Close
-              </button>
-            )}
-          </div>
-          <span>
-            <i className="material-icons">edit</i>
-          </span>
-        </div>
-        <div className="comments">
-          <div className="list">
-            {totalCount > 0 ? (
-              comments &&
-              comments.map(({ author, body, id }) => {
-                return (
-                  <div className="comment" key={id}>
-                    <div className="usr">
-                      <span>
-                        <img
-                          src={author.avatarUrl}
-                          className="usr-image"
-                          alt="img"
-                        />
-                      </span>
-                      <h4 style={{ marginLeft: 8 }}>{author.login}</h4>
-                    </div>
-                    <div className="comment-body">{body}</div>
-                  </div>
-                );
-              })
-            ) : (
-              <h4>There are no comments</h4>
-            )}
-          </div>
-          <div className="add-comment">
-            <div>
-              <textarea
-                rows={4}
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-              ></textarea>
-            </div>
-            <div>
-              <button
-                onClick={async () => {
-                  await addComment();
-                  await refetch();
-                }}
-              >
-                Comment
-              </button>
-            </div>
-          </div>
-        </div>
-      </Modal>
+      <EditIssue {...props} open={open} setOpen={setOpen} />
+
       <div className="tb-item">
         <div className="issue" onClick={() => setOpen(!open)}>
           <h4>{title}</h4>
           <small>
-            {" "}
+            {/* {" "}
             {totalCount ? totalCount : "no"} comment
-            {totalCount !== 1 ? "s" : ""}
+            {totalCount !== 1 ? "s" : ""} */}
+            {totalCount > 0 ? (
+              <span style={{ marginTop: 8 }}>
+                <span>{totalCount}</span>{" "}
+                <i style={{ fontSize: 16 }} className="material-icons">
+                  chat_bubble_outline
+                </i>
+              </span>
+            ) : (
+              <div></div>
+            )}
           </small>
         </div>
       </div>
       <div className="tb-item">
-        {numOfPeople > 0 ? nodes[numOfPeople - 1].login : ""}
+        <div className="stack">
+          {nodes[numOfPeople - 1]?.avatarUrl && (
+            <>
+              {/* <div className="stack-el"> */}
+              {Array(numOfPeople)
+                .fill(0)
+                .map((_, i) => {
+                  return (
+                    <img
+                      key={i}
+                      className="usr-image"
+                      title={nodes[numOfPeople - 1].login}
+                      width={20}
+                      height={20}
+                      style={{
+                        zIndex: i,
+                        left: i * 4,
+                      }}
+                      src={nodes[numOfPeople - 1].avatarUrl}
+                      alt={nodes[numOfPeople - 1].login}
+                    />
+                  );
+                })}
+              {/* </div> */}
+            </>
+          )}
+        </div>
       </div>
-      <div className="tb-item">{login}</div>
+      <div className="tb-item">
+        {avatarUrl && (
+          <img
+            className="usr-image"
+            title={login}
+            width={20}
+            height={20}
+            src={avatarUrl}
+            alt={login}
+          />
+        )}
+      </div>
       <div className="tb-item">
         <Label {...labels} />
       </div>

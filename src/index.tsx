@@ -38,6 +38,7 @@ client
           avatarUrl
           email
           name
+          id
         }
       }
     `,
@@ -49,6 +50,7 @@ client
         email: res.data.viewer.email,
         login: res.data.viewer.login,
         name: res.data.viewer.name,
+        id: res.data.viewer.id,
       };
       store.dispatch({ type: TYPES.auth.LOGIN, payload: user });
     }

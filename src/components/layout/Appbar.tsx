@@ -8,7 +8,7 @@ const Appbar = () => {
     <div className="appbar">
       {user ? (
         <div className="usr">
-          <span>
+          <span className="flex">
             <img src={user.avatarUrl} className="usr-image" alt="img" />
           </span>
           <span style={{ marginLeft: 8 }}>{user.login}</span>

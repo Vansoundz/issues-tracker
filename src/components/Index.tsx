@@ -3,12 +3,15 @@ import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { paths } from "../routes/paths";
 import { RootState } from "../store";
+import { dev } from "../utils";
 // import { Link } from "react-router-dom";
 // import { paths } from "../routes/paths";
 import Loading from "./layout/Loading";
 
+const CLIENT_ID = process.env.REACT_APP_GITHUB_CLIENT_ID;
+
 const Index = () => {
-  const { isLoggedIn } = useSelector((state: RootState) => state.auth);
+  const { isLoggedIn, loading } = useSelector((state: RootState) => state.auth);
   const h = useHistory();
 
   useEffect(() => {
@@ -16,16 +19,27 @@ const Index = () => {
       h.push(paths.issues);
     }
   }, [isLoggedIn, h]);
+
   return (
     <div className="app">
-      {false && <Loading />}
-      <button>
-        <a href="https://github.com/login/oauth/authorize?client_id=68a8cfcc2cd553f0683f">
-          Authorize
-        </a>
-        {/* Authorize */}
-        {/* <Link to={paths.issues}>Authorize</Link> */}
-      </button>
+      {loading && <Loading />}
+      <div>
+        <h4 style={{ fontSize: 26 }}>Welcome to GTrackR</h4>
+        <div>
+          <img src="/logo512.png" alt="logo" />
+        </div>
+        <button>
+          <a
+            href={`https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&scope=repo%20user&redirect_uri=${
+              dev
+                ? "http://localhost:3000/auth/callback"
+                : "https://gtrackr.netlify.app/auth/callback"
+            }`}
+          >
+            Log in with Github
+          </a>
+        </button>
+      </div>
     </div>
   );
 };

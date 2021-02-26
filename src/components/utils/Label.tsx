@@ -3,12 +3,10 @@ import "./utils.css";
 
 interface ILabel {
   totalCount: number;
-  nodes: [
-    {
-      color: string;
-      name: string;
-    }
-  ];
+  nodes: {
+    color: string;
+    name: string;
+  }[];
 }
 
 const Label: FC<ILabel> = ({ totalCount, nodes }) => {

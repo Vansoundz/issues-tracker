@@ -1,3 +1,8 @@
+:root {
+  --purple: #6a2fa5;
+  --orange: #e4932f;
+}
+
 * {
   margin: 0;
   font-family: sans-serif;
@@ -17,6 +22,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100vh;
 }
 
 i {
@@ -33,22 +39,40 @@ button:hover {
   border-radius: 1px solid #ddd;
 }
 
-.app > button,
+.app > div {
+  width: 300px;
+  height: 360px;
+  border: 1px solid rgb(221, 221, 221);
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.app > div > button,
 .add-comment button {
-  background: rebeccapurple;
+  background: var(--purple);
   color: white;
+  display: block;
   font-size: 18px;
 }
-.app > button > * {
+.app > div > button > * {
   color: white;
 }
 
 .btn-border {
-  border: 1px solid rebeccapurple;
-  color: rebeccapurple;
+  border: 1px solid var(--purple);
+  color: var(--purple);
 }
 
 .btn-purple {
-  background: rebeccapurple;
+  background: var(--purple);
   color: #fff;
+}
+
+.blue-link {
+  color: var(--purple);
+  cursor: pointer;
 }

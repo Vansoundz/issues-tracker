@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { dev } from "../../utils";
 import Loading from "../layout/Loading";
 
 const SECRET = process.env.REACT_APP_GITHUB_SECRET;
@@ -32,7 +33,9 @@ const Auth = () => {
           localStorage.setItem("__token", data.access_token);
         }
 
-        window.location.href = "https://gtrackr.netlify.app/";
+        window.location.href = dev
+          ? "http://localhost:3000"
+          : "https://gtrackr.netlify.app/";
       })();
     }
   }, [code]);

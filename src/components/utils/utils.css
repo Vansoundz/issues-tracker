@@ -59,10 +59,45 @@ input {
   width: 99%;
 }
 
+select:focus,
+input:focus,
+textarea:focus {
+  border: 1px solid var(--purple) !important;
+}
+
 .flex {
   display: flex;
 }
 
 .align-center {
   align-items: center;
+}
+
+.stack {
+  display: flex;
+  position: relative;
+}
+
+.tb-item img {
+  width: 20px;
+  height: 20px;
+  border: 1px solid white;
+  position: absolute;
+}
+
+.stack:hover img {
+  position: initial;
+}
+
+.repo {
+  padding: 4px 0;
+  cursor: pointer;
+}
+
+.repo:hover {
+  text-decoration: underline;
+}
+
+.repo.selected {
+  color: var(--purple);
 }
