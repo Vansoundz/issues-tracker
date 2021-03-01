@@ -17,6 +17,7 @@ import store from "./store";
 import { BrowserRouter as Router } from "react-router-dom";
 import { User } from "./models/user.model";
 import { TYPES } from "./store/types";
+import "react-toastify/dist/ReactToastify.css";
 
 const TOKEN = localStorage.__token;
 const client = new ApolloClient({

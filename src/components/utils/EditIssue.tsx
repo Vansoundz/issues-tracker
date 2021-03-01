@@ -1,5 +1,6 @@
-import { useMutation } from "@apollo/client";
+import { ApolloError, useMutation, useQuery } from "@apollo/client";
 import React, { FC, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import {
   ADD_COMMENT,
   CLOSE_ISSUE,
@@ -7,18 +8,20 @@ import {
   EDIT_ISSUE,
   REOPEN_ISSUE,
 } from "../../graphql/mutations";
+import { SEARCH_USER } from "../../graphql/queries";
 import { Issue } from "../../models/issue.model";
+import { User } from "../../models/user.model";
 import { addLinks } from "../../utils";
 import Loading from "../layout/Loading";
 import Modal from "./Modal";
 
-const EditIssue: FC<
-  Issue & {
-    refetch: () => void;
-    open: boolean;
-    setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  }
-> = (props) => {
+interface IEditIssue extends Issue {
+  refetch: () => void;
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const EditIssue: FC<IEditIssue> = (props) => {
   const {
     refetch,
     id,
@@ -26,35 +29,71 @@ const EditIssue: FC<
     title,
     comments: { nodes: comments, totalCount },
   } = props;
+
   const [newTitle, setNewTitle] = useState<string>("");
   const [comment, setComment] = useState<string>("");
   const [edit, setEdit] = useState(false);
+  const [query, setQuery] = useState("");
+  const [users, setUsers] = useState<User[]>([]);
+
+  const onError = (error: ApolloError) => {
+    toast(error.message, {
+      type: "error",
+      style: { color: "white" },
+    });
+  };
 
   const [addComment, { loading, data }] = useMutation(ADD_COMMENT, {
     variables: { id, body: comment },
+    onError,
+  });
+
+  useQuery(SEARCH_USER, {
+    variables: { query },
+    onCompleted: (data) => {
+      let usrs: User[] = [];
+      for (let user of data.search.edges) {
+        usrs.push(user.node);
+      }
+      setUsers(usrs);
+    },
+    onError,
   });
 
   const [closeIssue, { loading: closing }] = useMutation(CLOSE_ISSUE, {
     variables: { id },
+    onCompleted: (d) => {
+      toast("Issue closed successfully", { type: "success" });
+    },
+    onError,
   });
 
   const [reopenIssue, { loading: opening }] = useMutation(REOPEN_ISSUE, {
     variables: { id },
+    onCompleted: (d) => {
+      toast("Issue reopened successfully", { type: "success" });
+    },
+    onError,
   });
 
-  const [editIssue, { loading: editing, data: editData }] = useMutation(
-    EDIT_ISSUE,
-    {
-      variables: { id, title: newTitle },
-    }
-  );
+  const [editIssue, { loading: editing }] = useMutation(EDIT_ISSUE, {
+    variables: { id, title: newTitle },
+    onCompleted: (d) => {
+      toast("Issue edited successfully", { type: "success" });
+      setEdit(!edit);
+      setOpen(!open);
+    },
+    onError,
+  });
 
-  const [deleteIssue, { loading: deleting, data: deleteData }] = useMutation(
-    DELETE_ISSUE,
-    {
-      variables: { id },
-    }
-  );
+  const [deleteIssue, { loading: deleting }] = useMutation(DELETE_ISSUE, {
+    variables: { id },
+    onCompleted: (d) => {
+      toast("Issue deleted successfully", { type: "success" });
+      setOpen(!open);
+    },
+    onError,
+  });
 
   useEffect(() => {
     if (data && data.addComment?.commentEdge?.node.body) {
@@ -67,20 +106,9 @@ const EditIssue: FC<
   const { open, setOpen } = props;
 
   useEffect(() => {
-    if (editData?.updateIssue?.issue?.author?.login) {
-      setEdit(!edit);
-      setOpen(!open);
-    }
-
-    if (deleteData?.deleteIssue?.repository?.id) {
-      setOpen(!open);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editData, deleteData]);
-
-  useEffect(() => {
     setNewTitle(title);
   }, [title]);
+
   return (
     <Modal
       open={open}
@@ -226,11 +254,49 @@ const EditIssue: FC<
           )}
         </div>
         <div className="add-comment">
-          <div>
+          <div className="ac-cont">
+            <ul
+              className="users dropdown"
+              style={{
+                left: (comment.length || 1) * 4.5,
+                display: users.length ? "initial" : "none",
+              }}
+            >
+              {users &&
+                users.map((user, i) => {
+                  return (
+                    <li key={i} className="user-com">
+                      {user.login}
+                    </li>
+                  );
+                })}
+            </ul>
             <textarea
               rows={4}
               value={comment}
-              onChange={(e) => setComment(e.target.value)}
+              onChange={(e) => {
+                setComment(e.target.value);
+                let pat = /@([a-zA-Z])\w+/;
+
+                let matches = e.target.value.match(pat);
+                // console.log(matches);
+                if (!matches) return;
+                // matches = matches.filter((match) => {
+                //   return !users.find((user) => user.login !== match.substr(1));
+                // });
+
+                // console.log(matches);
+
+                if (matches.length > 0) {
+                  console.log("Setting", matches[0].substr(1));
+                  if (matches[0].substr(1).length > 2) {
+                    setQuery(matches[0].substr(1));
+                  } else {
+                    setUsers([]);
+                    setQuery("");
+                  }
+                }
+              }}
             ></textarea>
           </div>
           <div>

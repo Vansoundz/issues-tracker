@@ -101,3 +101,14 @@ textarea:focus {
 .repo.selected {
   color: var(--purple);
 }
+
+/*  */
+.ac-cont {
+  position: relative;
+}
+
+.users {
+  position: absolute;
+  padding: 4px;
+  top: 16px;
+}

@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@apollo/client";
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useState } from "react";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import { CREATE_ISSUE } from "../../graphql/mutations";
 import { SEARCH_REPO } from "../../graphql/queries";
 import { Repo } from "../../models/repo.model";
@@ -19,34 +20,39 @@ const CreateIssue: FC<IModal> = ({ close, open, refetch }) => {
   const [query, setQuery] = useState("");
   const [repositories, setrepositories] = useState<Repo[]>([]);
   const [repo, setRepo] = useState<Repo>();
-  const { data: repos, loading: searching } = useQuery(SEARCH_REPO, {
+
+  const { loading: searching } = useQuery(SEARCH_REPO, {
     variables: { query },
+    onCompleted: (d) => {
+      let r: Repo[] = [];
+      for (let repo of d.search.edges) {
+        r.push(repo.node);
+      }
+      setrepositories(r);
+    },
   });
 
   const { user } = useSelector((state: RootState) => state.auth);
-  // str = "user:vansoundz dencies"
-
-  useEffect(() => {
-    let mounted = true;
-
-    if (mounted)
-      if (repos?.search?.edges) {
-        let r: Repo[] = [];
-        for (let repo of repos.search.edges) {
-          r.push(repo.node);
-        }
-        setrepositories(r);
-      }
-
-    return () => {
-      mounted = false;
-    };
-  }, [repos]);
 
   const [issue, setIssue] = useState<ILIssue>({ id: "", title: "" });
 
   const [createIssue, { loading }] = useMutation(CREATE_ISSUE, {
     variables: { ...issue },
+    onError: (error) => {
+      toast(error.message, {
+        type: "error",
+        style: { color: "white" },
+      });
+    },
+    onCompleted: (d) => {
+      toast("Issue created successfully", {
+        type: "success",
+        style: { color: "white" },
+      });
+      close();
+      setIssue({ title: "", id: "" });
+      setRepo(undefined);
+    },
   });
 
   return (
@@ -65,6 +71,7 @@ const CreateIssue: FC<IModal> = ({ close, open, refetch }) => {
               <input
                 type="text"
                 id="title"
+                value={issue.title}
                 onChange={(e) =>
                   setIssue({
                     ...issue,
@@ -139,7 +146,6 @@ const CreateIssue: FC<IModal> = ({ close, open, refetch }) => {
                   onClick={async (e) => {
                     await createIssue();
                     if (refetch) await refetch();
-                    close();
                   }}
                 >
                   create Issue
