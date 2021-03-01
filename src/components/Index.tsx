@@ -30,7 +30,7 @@ const Index = () => {
         </div>
         <button>
           <a
-            href={`https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&scope=repo%20user&redirect_uri=${
+            href={`https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&scope=public_repo%20user&redirect_uri=${
               dev
                 ? "http://localhost:3000/auth/callback"
                 : "https://gtrackr.netlify.app/auth/callback"
