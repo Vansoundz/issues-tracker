@@ -1,4 +1,4 @@
-import { IssueFilters } from "../../models/issue.model";
+import { Issue, IssueFilters } from "../../models/issue.model";
 import { User } from "../../models/user.model";
 
 interface AuthReducer {
@@ -9,6 +9,9 @@ interface AuthReducer {
 
 interface IssuesReducer {
   filters: IssueFilters;
+  showSearch: boolean;
+  issue?: Issue;
+  editIssue: boolean;
 }
 
 export type { AuthReducer, IssuesReducer };

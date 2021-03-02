@@ -1,25 +1,30 @@
-import React, { FC, useState } from "react";
+import React, { FC } from "react";
+import { useDispatch } from "react-redux";
 import { Issue as IssueModel } from "../../models/issue.model";
+import { TYPES } from "../../store/types";
 import Label from "./Label";
-import EditIssue from "./EditIssue";
 
-const IssueComponent: FC<IssueModel & { refetch: () => void }> = (props) => {
+const IssueComponent: FC<IssueModel> = (issue) => {
+  const dispatch = useDispatch();
+
   const {
     title,
     comments: { totalCount },
     author: { login, avatarUrl },
     labels,
     assignees: { nodes, totalCount: numOfPeople },
-  } = props;
-
-  const [open, setOpen] = useState(false);
+  } = issue;
 
   return (
     <div className="issue-entry">
-      <EditIssue {...props} open={open} setOpen={setOpen} />
-
       <div className="tb-item">
-        <div className="issue" onClick={() => setOpen(!open)}>
+        <div
+          className="issue"
+          onClick={() => {
+            dispatch({ type: TYPES.issues.SELECT_ISSUE, payload: issue });
+            dispatch({ type: TYPES.issues.SET_EDIT_ISSUE, payload: true });
+          }}
+        >
           <h4>{title}</h4>
           <small>
             {/* {" "}

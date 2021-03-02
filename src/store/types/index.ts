@@ -6,6 +6,9 @@ const TYPES = {
   issues: {
     FILTER: "FILTER",
     CLEAR_FILTERS: "CLEAR_FILTERS",
+    SHOW_SEARCH: "SHOW_SEARCH",
+    SELECT_ISSUE: "SELECT_ISSUE",
+    SET_EDIT_ISSUE: "SET_EDIT_ISSUE",
   },
 };
 

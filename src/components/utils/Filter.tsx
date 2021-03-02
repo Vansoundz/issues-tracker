@@ -3,9 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import { TYPES } from "../../store/types";
 
-const Filter: FC<{
-  setShowsearch: (value: React.SetStateAction<boolean>) => void;
-}> = ({ setShowsearch }) => {
+const Filter: FC = () => {
   const dispatch = useDispatch();
   const { filters } = useSelector((state: RootState) => state.issues);
 
@@ -13,7 +11,9 @@ const Filter: FC<{
     <div
       id="filter-drop"
       className="query-filter dropdown"
-      onClick={() => setShowsearch(false)}
+      onClick={() =>
+        dispatch({ type: TYPES.issues.SHOW_SEARCH, payload: false })
+      }
     >
       <h4>Filter by</h4>
       <ul>

@@ -7,6 +7,7 @@ import { RootState } from "../../store";
 import { TYPES } from "../../store/types";
 import Loading from "../layout/Loading";
 import CreateIssue from "../utils/CreateIssue";
+import EditIssue from "../utils/EditIssue";
 import Filter from "../utils/Filter";
 import IssueComponent from "../utils/Issue";
 import "./pages.css";
@@ -16,40 +17,29 @@ const Issues = () => {
 
   const [query, setQuery] = useState<string>("");
   const [search, setSearch] = useState<string>("");
-  const { filters } = useSelector((state: RootState) => state.issues);
-  const dispatch = useDispatch();
+  const { filters, showSearch, issue } = useSelector(
+    (state: RootState) => state.issues
+  );
 
-  const { loading, data, error, refetch } = useQuery(ISSUES, {
+  const dispatch = useDispatch();
+  const { loading, error, refetch } = useQuery(ISSUES, {
     variables: { filters },
+    onCompleted: (data) => {
+      console.log(data);
+      setIssues(data.viewer?.issues?.nodes);
+    },
   });
 
-  const [showSearch, setShowsearch] = useState(false);
   const [open, setOpen] = useState(false);
   const [issues, setIssues] = useState<Issue[]>([]);
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const { loading: searching, data: searchData } = useQuery(SEARCH, {
+  const { loading: searching } = useQuery(SEARCH, {
     variables: { query },
+    onCompleted: (data) => {
+      if (showSearch) setIssues(data.search?.nodes);
+    },
   });
-
-  useEffect(() => {
-    let mounted = true;
-    if (mounted) {
-      if (data && data.viewer?.issues?.nodes) {
-        setIssues(data.viewer?.issues?.nodes);
-      }
-
-      // console.log(searchData);
-      if (showSearch)
-        if (searchData && searchData.search?.nodes) {
-          setIssues(searchData.search?.nodes);
-        }
-    }
-
-    return () => {
-      mounted = false;
-    };
-  }, [data, searchData, showSearch]);
 
   useEffect(() => {
     if (error) {
@@ -61,6 +51,7 @@ const Issues = () => {
     <div className="issues">
       {(loading || searching) && <Loading />}
       <CreateIssue open={open} close={() => setOpen(!open)} refetch={refetch} />
+      <EditIssue refetch={refetch} {...issue} />
 
       <div className="filters" style={{ justifyContent: "space-between" }}>
         <div>
@@ -90,7 +81,7 @@ const Issues = () => {
               </span>{" "}
               <span> Add filter</span>
             </button>
-            <Filter setShowsearch={setShowsearch} />
+            <Filter />
           </div>
           <div>
             <button
@@ -105,7 +96,7 @@ const Issues = () => {
                 e.preventDefault();
 
                 if (search?.length > 3) {
-                  setShowsearch(true);
+                  dispatch({ type: TYPES.issues.SHOW_SEARCH, payload: true });
                   setQuery(`user:${user?.login} in:title ${search}`);
                 }
               }}
@@ -114,7 +105,10 @@ const Issues = () => {
                 type="search"
                 onChange={(e) => {
                   if (e.target.value.length <= 3) {
-                    setShowsearch(false);
+                    dispatch({
+                      type: TYPES.issues.SHOW_SEARCH,
+                      payload: false,
+                    });
                   }
                   setSearch(e.target.value);
                 }}
@@ -135,7 +129,7 @@ const Issues = () => {
         {issues.length > 0 ? (
           <div className="table-body">
             {issues.map((issue) => (
-              <IssueComponent {...issue} refetch={refetch} key={issue.id} />
+              <IssueComponent {...issue} key={issue.id} />
             ))}
           </div>
         ) : (

@@ -9,7 +9,7 @@ import { RootState } from "./store";
 function App() {
   const { loading } = useSelector((state: RootState) => state.auth);
   return (
-    <>
+    <div title="app">
       {loading ? <Loading /> : <Routes />}
       <ToastContainer
         hideProgressBar={true}
@@ -17,7 +17,7 @@ function App() {
         position="top-right"
         style={{ color: "white" }}
       />
-    </>
+    </div>
   );
 }
 

@@ -39,7 +39,7 @@ interface IssueFilters {
 
 type TAction = {
   type: string;
-  payload: IssueFilters;
+  payload: IssueFilters | boolean;
 };
 
 export type { Issue, IssueFilters, TAction, Comment };

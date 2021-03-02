@@ -1,5 +1,6 @@
 import { ApolloError, useMutation, useQuery } from "@apollo/client";
 import React, { FC, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import {
   ADD_COMMENT,
@@ -9,26 +10,26 @@ import {
   REOPEN_ISSUE,
 } from "../../graphql/mutations";
 import { SEARCH_USER } from "../../graphql/queries";
-import { Issue } from "../../models/issue.model";
 import { User } from "../../models/user.model";
+import { RootState } from "../../store";
+import { TYPES } from "../../store/types";
 import { addLinks } from "../../utils";
 import Loading from "../layout/Loading";
 import Modal from "./Modal";
 
-interface IEditIssue extends Issue {
+interface IEditIssue {
   refetch: () => void;
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const EditIssue: FC<IEditIssue> = (props) => {
-  const {
-    refetch,
-    id,
-    closed,
-    title,
-    comments: { nodes: comments, totalCount },
-  } = props;
+const EditIssue: FC<IEditIssue> = ({ refetch }) => {
+  const { issue } = useSelector((state: RootState) => state.issues);
+  if (issue)
+    var {
+      id,
+      closed,
+      title,
+      comments: { nodes: comments, totalCount },
+    } = issue;
 
   const [newTitle, setNewTitle] = useState<string>("");
   const [comment, setComment] = useState<string>("");
@@ -36,6 +37,8 @@ const EditIssue: FC<IEditIssue> = (props) => {
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState<User[]>([]);
 
+  const { editIssue: open } = useSelector((state: RootState) => state.issues);
+  const dispatch = useDispatch();
   const onError = (error: ApolloError) => {
     toast(error.message, {
       type: "error",
@@ -78,10 +81,11 @@ const EditIssue: FC<IEditIssue> = (props) => {
 
   const [editIssue, { loading: editing }] = useMutation(EDIT_ISSUE, {
     variables: { id, title: newTitle },
-    onCompleted: (d) => {
+    onCompleted: async (d) => {
       toast("Issue edited successfully", { type: "success" });
       setEdit(!edit);
-      setOpen(!open);
+      await refetch();
+      dispatch({ type: TYPES.issues.SET_EDIT_ISSUE, payload: !open });
     },
     onError,
   });
@@ -90,7 +94,7 @@ const EditIssue: FC<IEditIssue> = (props) => {
     variables: { id },
     onCompleted: (d) => {
       toast("Issue deleted successfully", { type: "success" });
-      setOpen(!open);
+      dispatch({ type: TYPES.issues.SET_EDIT_ISSUE, payload: !open });
     },
     onError,
   });
@@ -103,8 +107,6 @@ const EditIssue: FC<IEditIssue> = (props) => {
     }
   }, [data]);
 
-  const { open, setOpen } = props;
-
   useEffect(() => {
     setNewTitle(title);
   }, [title]);
@@ -113,7 +115,7 @@ const EditIssue: FC<IEditIssue> = (props) => {
     <Modal
       open={open}
       close={() => {
-        setOpen(!open);
+        dispatch({ type: TYPES.issues.SET_EDIT_ISSUE, payload: !open });
       }}
     >
       {(loading || closing || opening || editing || deleting) && <Loading />}
