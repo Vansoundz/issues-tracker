@@ -14,6 +14,7 @@ const issuesReducer = (state = initState, action: TAction): IssuesReducer => {
     case TYPES.issues.FILTER:
       return {
         ...state,
+        showSearch: false,
         filters: {
           ...state.filters,
           // @ts-ignore
@@ -24,6 +25,7 @@ const issuesReducer = (state = initState, action: TAction): IssuesReducer => {
       return {
         ...state,
         filters: {},
+        showSearch: false,
       };
     case TYPES.issues.SHOW_SEARCH:
       return {

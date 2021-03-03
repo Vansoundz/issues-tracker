@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ISSUES, SEARCH } from "../graphql/queries";
 import { Issue } from "../models/issue.model";
@@ -22,29 +22,25 @@ const Issues = () => {
   );
 
   const dispatch = useDispatch();
-  const { loading, error, refetch } = useQuery(ISSUES, {
+  const { loading, refetch } = useQuery(ISSUES, {
     variables: { filters },
     onCompleted: (data) => {
       setIssues(data.viewer?.issues?.nodes);
     },
+    onError: (error) => {},
   });
 
   const [open, setOpen] = useState(false);
   const [issues, setIssues] = useState<Issue[]>([]);
+  const [searchRes, setSearchRes] = useState<Issue[]>([]);
   const { user } = useSelector((state: RootState) => state.auth);
 
   const { loading: searching } = useQuery(SEARCH, {
     variables: { query },
     onCompleted: (data) => {
-      if (showSearch) setIssues(data.search?.nodes);
+      if (showSearch) setSearchRes(data.search?.nodes);
     },
   });
-
-  useEffect(() => {
-    if (error) {
-      console.log(error);
-    }
-  }, [error]);
 
   return (
     <div className="issues">
@@ -104,6 +100,10 @@ const Issues = () => {
                 type="search"
                 onChange={(e) => {
                   if (e.target.value.length <= 3) {
+                    refetch();
+                    dispatch({
+                      type: TYPES.issues.CLEAR_FILTERS,
+                    });
                     dispatch({
                       type: TYPES.issues.SHOW_SEARCH,
                       payload: false,
@@ -125,21 +125,37 @@ const Issues = () => {
           <div className="th-item">Author</div>
           <div className="th-item">Label</div>
         </div>
-        {issues.length > 0 ? (
-          <div className="table-body">
-            {issues.map((issue) => (
-              <IssueComponent {...issue} key={issue.id} />
-            ))}
-          </div>
+        {showSearch ? (
+          <>
+            {searchRes.length > 0 ? (
+              <>
+                {searchRes.map((issue) => (
+                  <IssueComponent {...issue} key={issue.id} />
+                ))}
+              </>
+            ) : (
+              <>
+                <div className="show">
+                  <h4>There are no issues matching that term</h4>
+                </div>
+              </>
+            )}
+          </>
         ) : (
           <>
-            <div className="show">
-              {showSearch ? (
-                <h4>There are no issues matching that term</h4>
-              ) : (
-                <h4>You have no issues</h4>
-              )}
-            </div>
+            {issues.length > 0 ? (
+              <div className="table-body">
+                {issues.map((issue) => (
+                  <IssueComponent {...issue} key={issue.id} />
+                ))}
+              </div>
+            ) : (
+              <>
+                <div className="show">
+                  <h4>Looks like you have no issues</h4>
+                </div>
+              </>
+            )}
           </>
         )}
       </div>
