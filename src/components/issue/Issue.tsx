@@ -2,7 +2,7 @@ import React, { FC } from "react";
 import { useDispatch } from "react-redux";
 import { Issue as IssueModel } from "../../models/issue.model";
 import { TYPES } from "../../store/types";
-import Label from "./Label";
+import Label from "../utils/Label";
 
 const IssueComponent: FC<IssueModel> = (issue) => {
   const dispatch = useDispatch();

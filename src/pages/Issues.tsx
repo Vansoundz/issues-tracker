@@ -1,16 +1,16 @@
 import { useQuery } from "@apollo/client";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ISSUES, SEARCH } from "../../graphql/queries";
-import { Issue } from "../../models/issue.model";
-import { RootState } from "../../store";
-import { TYPES } from "../../store/types";
-import Loading from "../layout/Loading";
-import CreateIssue from "../utils/CreateIssue";
-import EditIssue from "../utils/EditIssue";
-import Filter from "../utils/Filter";
-import IssueComponent from "../utils/Issue";
+import { ISSUES, SEARCH } from "../graphql/queries";
+import { Issue } from "../models/issue.model";
+import { RootState } from "../store";
+import { TYPES } from "../store/types";
+import Loading from "../components/layout/Loading";
+import CreateIssue from "../components/issue/CreateIssue";
 import "./pages.css";
+import EditIssue from "../components/issue/EditIssue";
+import Filter from "../components/utils/Filter";
+import IssueComponent from "../components/issue/Issue";
 
 const Issues = () => {
   // const [filters, setFilters] = useState<IssueFilters>({});
@@ -25,7 +25,6 @@ const Issues = () => {
   const { loading, error, refetch } = useQuery(ISSUES, {
     variables: { filters },
     onCompleted: (data) => {
-      console.log(data);
       setIssues(data.viewer?.issues?.nodes);
     },
   });

@@ -70,7 +70,7 @@ const CreateIssue: FC<IModal> = ({ close, open, refetch }) => {
               </div>
               <input
                 type="text"
-                id="title"
+                data-testid="title"
                 value={issue.title}
                 onChange={(e) =>
                   setIssue({
@@ -86,6 +86,7 @@ const CreateIssue: FC<IModal> = ({ close, open, refetch }) => {
               </div>
               <textarea
                 rows={4}
+                data-testid="body"
                 value={issue.body || ""}
                 onChange={(e) =>
                   setIssue({
@@ -104,6 +105,7 @@ const CreateIssue: FC<IModal> = ({ close, open, refetch }) => {
                 </div>
                 <input
                   type="text"
+                  data-testid="search-repo"
                   onChange={(e) => {
                     setQuery(`user:${user?.login} ${e.target.value}`);
                   }}

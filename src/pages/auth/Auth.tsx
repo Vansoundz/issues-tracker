@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { dev } from "../../utils";
-import Loading from "../layout/Loading";
+import Loading from "../../components/layout/Loading";
 
 const SECRET = process.env.REACT_APP_GITHUB_SECRET;
 const CLIENT_ID = process.env.REACT_APP_GITHUB_CLIENT_ID;

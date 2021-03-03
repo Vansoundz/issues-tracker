@@ -6,7 +6,7 @@ import { RootState } from "../store";
 import { dev } from "../utils";
 // import { Link } from "react-router-dom";
 // import { paths } from "../routes/paths";
-import Loading from "./layout/Loading";
+import Loading from "../components/layout/Loading";
 
 const CLIENT_ID = process.env.REACT_APP_GITHUB_CLIENT_ID;
 

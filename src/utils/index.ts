@@ -8,12 +8,9 @@ const addLinks = (text: string) => {
 
     text = text.replace(
       pat,
-      `<a class="blue-link" target="_blank" 
-            rel="noreferrer" 
-            href="https://github.com/${el.substr(1)}" >
-            ${el.substr(1)}
-        </a>
-        `
+      `<a class="blue-link" target="_blank" rel="noreferrer" href="https://github.com/${el.substr(
+        1
+      )}" >${el.substr(1)}</a>`
     );
   }
 

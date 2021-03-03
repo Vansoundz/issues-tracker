@@ -1,10 +1,10 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
-import Auth from "../components/auth/Auth";
-import Index from "../components/Index";
+import Auth from "../pages/auth/Auth";
+import Index from "../pages/Index";
 import Common from "../components/layout/Common";
 import MainApp from "../components/layout/MainApp";
-import Issues from "../components/pages/Issues";
+import Issues from "../pages/Issues";
 import { paths } from "./paths";
 
 const Routes = () => {

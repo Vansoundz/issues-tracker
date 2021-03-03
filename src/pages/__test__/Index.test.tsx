@@ -1,10 +1,11 @@
 import { MockedProvider } from "@apollo/client/testing";
-import { render, screen } from "@testing-library/react";
-import React from "react";
+import { render } from "@testing-library/react";
 import { ISSUES } from "../../graphql/queries";
 import { Issue, IssueFilters } from "../../models/issue.model";
 import TestApp from "../../TestApp";
-import IssueComponent from "./Issue";
+import Issues from "../Issues";
+import React from "react";
+import Index from "../Index";
 
 let filters: IssueFilters = {};
 
@@ -21,7 +22,7 @@ let issue: Issue = {
     login: "vans",
     name: "keeps man",
   },
-  body: "lorem ipsum vpiuagsud",
+  body: "lorem ipsum  vpiuagsud",
   closed: true,
   comments: {
     nodes: [],
@@ -54,21 +55,30 @@ const mocks = [
       },
     },
   },
-]; // We'll fill this in next
+];
 
-it("renders without error", async () => {
-  // const { queryByText } =
-  render(
-    <MockedProvider mocks={mocks}>
-      <TestApp>
-        <IssueComponent {...issue} />
-      </TestApp>
-    </MockedProvider>
+it("renders whith github link", async () => {
+  const { findByText } = render(
+    <TestApp>
+      <Index />
+    </TestApp>
   );
 
-  const elem = await screen.findByText("some issue");
+  const el = await findByText("Log in with Github");
+  expect(el).toBeTruthy();
+});
 
-  // const el = queryByText("some issue");
+it("rendersIssueComponent", async () => {
+  const { findAllByText } = render(
+    <>
+      <TestApp>
+        <MockedProvider mocks={mocks}>
+          <Issues />
+        </MockedProvider>
+      </TestApp>
+    </>
+  );
 
-  expect(elem).toBeTruthy();
+  const els = await findAllByText("some issue");
+  expect(els).toBeTruthy();
 });

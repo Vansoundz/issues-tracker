@@ -15,7 +15,7 @@ import { RootState } from "../../store";
 import { TYPES } from "../../store/types";
 import { addLinks } from "../../utils";
 import Loading from "../layout/Loading";
-import Modal from "./Modal";
+import Modal from "../utils/Modal";
 
 interface IEditIssue {
   refetch: () => void;
