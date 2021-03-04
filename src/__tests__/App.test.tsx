@@ -10,7 +10,7 @@ it("renders without error", async () => {
     </TestApp>
   );
 
-  const el = screen.queryByTitle("app");
+  const el = screen.queryByTestId("app");
 
   expect(el).toBeTruthy();
 });
