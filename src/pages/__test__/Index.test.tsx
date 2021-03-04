@@ -5,7 +5,7 @@ import { Issue, IssueFilters } from "../../models/issue.model";
 import TestApp from "../../TestApp";
 import Issues from "../Issues";
 import React from "react";
-import Index from "../Index";
+// import Index from "../Index";
 
 let filters: IssueFilters = {};
 
@@ -57,16 +57,16 @@ const mocks = [
   },
 ];
 
-it("renders whith github link", async () => {
-  const { findByText } = render(
-    <TestApp>
-      <Index />
-    </TestApp>
-  );
+// it("renders whith github link", async () => {
+//   const { findByText } = render(
+//     <TestApp>
+//       <Index />
+//     </TestApp>
+//   );
 
-  const el = await findByText("Log in with Github");
-  expect(el).toBeTruthy();
-});
+//   const el = await findByText("Log in with Github");
+//   expect(el).toBeTruthy();
+// });
 
 it("rendersIssueComponent", async () => {
   const { findAllByText } = render(

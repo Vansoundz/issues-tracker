@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ISSUES, SEARCH } from "../graphql/queries";
 import { Issue } from "../models/issue.model";
@@ -17,21 +17,24 @@ const Issues = () => {
 
   const [query, setQuery] = useState<string>("");
   const [search, setSearch] = useState<string>("");
-  const { filters, showSearch, issue } = useSelector(
+  const { filters, showSearch, issue, issues } = useSelector(
     (state: RootState) => state.issues
   );
 
   const dispatch = useDispatch();
-  const { loading, refetch } = useQuery(ISSUES, {
+  const { loading, refetch, data } = useQuery(ISSUES, {
     variables: { filters },
     onCompleted: (data) => {
-      setIssues(data.viewer?.issues?.nodes);
+      dispatch({
+        type: TYPES.issues.LOAD_ISSUES,
+        payload: data.viewer?.issues?.nodes,
+      });
     },
     onError: (error) => {},
   });
 
   const [open, setOpen] = useState(false);
-  const [issues, setIssues] = useState<Issue[]>([]);
+  // const [issues, setIssues] = useState<Issue[]>([]);
   const [searchRes, setSearchRes] = useState<Issue[]>([]);
   const { user } = useSelector((state: RootState) => state.auth);
 
@@ -41,6 +44,15 @@ const Issues = () => {
       if (showSearch) setSearchRes(data.search?.nodes);
     },
   });
+
+  useEffect(() => {
+    if (data?.viewer?.issues?.nodes) {
+      dispatch({
+        type: TYPES.issues.LOAD_ISSUES,
+        payload: data.viewer?.issues?.nodes,
+      });
+    }
+  }, [data, dispatch]);
 
   return (
     <div className="issues">
@@ -143,7 +155,7 @@ const Issues = () => {
           </>
         ) : (
           <>
-            {issues.length > 0 ? (
+            {issues && issues.length > 0 ? (
               <div className="table-body">
                 {issues.map((issue) => (
                   <IssueComponent {...issue} key={issue.id} />

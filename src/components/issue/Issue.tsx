@@ -21,7 +21,7 @@ const IssueComponent: FC<IssueModel> = (issue) => {
         <div
           className="issue"
           onClick={() => {
-            dispatch({ type: TYPES.issues.SELECT_ISSUE, payload: issue });
+            dispatch({ type: TYPES.issues.SELECT_ISSUE, payload: issue.id });
             dispatch({ type: TYPES.issues.SET_EDIT_ISSUE, payload: true });
           }}
         >

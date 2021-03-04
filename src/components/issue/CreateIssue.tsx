@@ -44,7 +44,8 @@ const CreateIssue: FC<IModal> = ({ close, open, refetch }) => {
         style: { color: "white" },
       });
     },
-    onCompleted: (d) => {
+    onCompleted: async (d) => {
+      if (refetch) await refetch();
       toast("Issue created successfully", {
         type: "success",
         style: { color: "white" },

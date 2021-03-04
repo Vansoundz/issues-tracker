@@ -48,6 +48,9 @@ const EditIssue: FC<IEditIssue> = ({ refetch }) => {
 
   const [addComment, { loading, data }] = useMutation(ADD_COMMENT, {
     variables: { id, body: comment },
+    onCompleted: async () => {
+      await refetch();
+    },
     onError,
   });
 
@@ -65,7 +68,8 @@ const EditIssue: FC<IEditIssue> = ({ refetch }) => {
 
   const [closeIssue, { loading: closing }] = useMutation(CLOSE_ISSUE, {
     variables: { id },
-    onCompleted: (d) => {
+    onCompleted: async (d) => {
+      await refetch();
       toast("Issue closed successfully", { type: "success" });
     },
     onError,
@@ -73,7 +77,8 @@ const EditIssue: FC<IEditIssue> = ({ refetch }) => {
 
   const [reopenIssue, { loading: opening }] = useMutation(REOPEN_ISSUE, {
     variables: { id },
-    onCompleted: (d) => {
+    onCompleted: async (d) => {
+      await refetch();
       toast("Issue reopened successfully", { type: "success" });
     },
     onError,
@@ -82,9 +87,9 @@ const EditIssue: FC<IEditIssue> = ({ refetch }) => {
   const [editIssue, { loading: editing }] = useMutation(EDIT_ISSUE, {
     variables: { id, title: newTitle },
     onCompleted: async (d) => {
+      await refetch();
       toast("Issue edited successfully", { type: "success" });
       setEdit(!edit);
-      await refetch();
       dispatch({ type: TYPES.issues.SET_EDIT_ISSUE, payload: !open });
     },
     onError,
@@ -92,7 +97,8 @@ const EditIssue: FC<IEditIssue> = ({ refetch }) => {
 
   const [deleteIssue, { loading: deleting }] = useMutation(DELETE_ISSUE, {
     variables: { id },
-    onCompleted: (d) => {
+    onCompleted: async (d) => {
+      await refetch();
       toast("Issue deleted successfully", { type: "success" });
       dispatch({ type: TYPES.issues.SET_EDIT_ISSUE, payload: !open });
     },

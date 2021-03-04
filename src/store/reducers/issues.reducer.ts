@@ -37,7 +37,17 @@ const issuesReducer = (state = initState, action: TAction): IssuesReducer => {
       return {
         ...state,
         // @ts-ignore
-        issue: payload,
+        issue: state.issues?.find((issue) => issue.id === payload),
+      };
+    case TYPES.issues.LOAD_ISSUES:
+      return {
+        ...state,
+        // @ts-ignore
+        issues: payload,
+        issue:
+          state.issue &&
+          // @ts-ignore
+          payload?.find((issue) => issue.id === state.issue?.id),
       };
     case TYPES.issues.SET_EDIT_ISSUE:
       return {

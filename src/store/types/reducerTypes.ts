@@ -12,6 +12,7 @@ interface IssuesReducer {
   showSearch: boolean;
   issue?: Issue;
   editIssue: boolean;
+  issues?: Issue[];
 }
 
 export type { AuthReducer, IssuesReducer };
