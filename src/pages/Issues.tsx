@@ -140,11 +140,11 @@ const Issues = () => {
         {showSearch ? (
           <>
             {searchRes.length > 0 ? (
-              <>
+              <div className="table-body">
                 {searchRes.map((issue) => (
                   <IssueComponent {...issue} key={issue.id} />
                 ))}
-              </>
+              </div>
             ) : (
               <>
                 <div className="show">

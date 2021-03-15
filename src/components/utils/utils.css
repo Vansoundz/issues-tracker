@@ -62,7 +62,7 @@ input {
 select:focus,
 input:focus,
 textarea:focus {
-  border: 1px solid var(--purple) !important;
+  border: 1px solid var(--blue) !important;
 }
 
 .flex {
@@ -99,7 +99,7 @@ textarea:focus {
 }
 
 .repo.selected {
-  color: var(--purple);
+  color: var(--blue);
 }
 
 /*  */

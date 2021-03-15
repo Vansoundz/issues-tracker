@@ -1,5 +1,5 @@
 :root {
-  --purple: #6a2fa5;
+  --blue: #3498db;
   --orange: #e4932f;
 }
 
@@ -53,7 +53,7 @@ button:hover {
 
 .app > div > button,
 .add-comment button {
-  background: var(--purple);
+  background: var(--blue);
   color: white;
   display: block;
   font-size: 18px;
@@ -63,16 +63,16 @@ button:hover {
 }
 
 .btn-border {
-  border: 1px solid var(--purple);
-  color: var(--purple);
+  border: 1px solid var(--blue);
+  color: var(--blue);
 }
 
-.btn-purple {
-  background: var(--purple);
+.btn-blue {
+  background: var(--blue);
   color: #fff;
 }
 
 .blue-link {
-  color: var(--purple);
+  color: var(--blue);
   cursor: pointer;
 }

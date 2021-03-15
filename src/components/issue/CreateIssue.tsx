@@ -39,6 +39,16 @@ const CreateIssue: FC<IModal> = ({ close, open, refetch }) => {
   const [createIssue, { loading }] = useMutation(CREATE_ISSUE, {
     variables: { ...issue },
     onError: (error) => {
+      if (
+        error.message === "Could not resolve to a node with the global id of ''"
+      ) {
+        toast("Please select a repository", {
+          type: "error",
+          style: { color: "white" },
+        });
+
+        return;
+      }
       toast(error.message, {
         type: "error",
         style: { color: "white" },
@@ -111,7 +121,11 @@ const CreateIssue: FC<IModal> = ({ close, open, refetch }) => {
                     setQuery(`user:${user?.login} ${e.target.value}`);
                   }}
                 />
-                <div>
+                <div
+                  style={{
+                    padding: "16px 0",
+                  }}
+                >
                   {searching ? (
                     <div>Loading...</div>
                   ) : (
