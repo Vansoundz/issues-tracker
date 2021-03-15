@@ -5,6 +5,7 @@ const paths = {
   milestones: "/milestones",
   pull: "/pull-requests",
   auth: "/auth/callback",
+  notFound: "*",
 };
 
 export { paths };
