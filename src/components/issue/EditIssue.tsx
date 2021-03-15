@@ -49,6 +49,7 @@ const EditIssue: FC<IEditIssue> = ({ refetch }) => {
   const [addComment, { loading, data }] = useMutation(ADD_COMMENT, {
     variables: { id, body: comment },
     onCompleted: async () => {
+      setUsers([]);
       await refetch();
     },
     onError,
@@ -271,9 +272,25 @@ const EditIssue: FC<IEditIssue> = ({ refetch }) => {
               }}
             >
               {users &&
+                users.length > 0 &&
                 users.map((user, i) => {
                   return (
-                    <li key={i} className="user-com">
+                    <li
+                      key={i}
+                      className="user-com"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => {
+                        let pat = /(@([a-zA-Z])\w+)$/g;
+
+                        let matches = comment.match(pat);
+                        if (!matches) return;
+
+                        let login = matches[matches.length - 1].slice(1);
+                        let com = comment.replace(login, user.login);
+                        setComment(com);
+                        setUsers([]);
+                      }}
+                    >
                       {user.login}
                     </li>
                   );
@@ -282,9 +299,10 @@ const EditIssue: FC<IEditIssue> = ({ refetch }) => {
             <textarea
               rows={4}
               value={comment}
+              // autoComplete={users.length ? users[0].login : ""}
               onChange={(e) => {
                 setComment(e.target.value);
-                let pat = /@([a-zA-Z])\w+/;
+                let pat = /(@([a-zA-Z])\w+)$/g;
 
                 let matches = e.target.value.match(pat);
                 // console.log(matches);
@@ -296,9 +314,10 @@ const EditIssue: FC<IEditIssue> = ({ refetch }) => {
                 // console.log(matches);
 
                 if (matches.length > 0) {
-                  console.log("Setting", matches[0].substr(1));
-                  if (matches[0].substr(1).length > 2) {
-                    setQuery(matches[0].substr(1));
+                  // console.log(matches);
+                  // console.log("Setting", matches[0].substr(1));
+                  if (matches[matches.length - 1].substr(1).length > 2) {
+                    setQuery(matches[matches.length - 1].substr(1));
                   } else {
                     setUsers([]);
                     setQuery("");
